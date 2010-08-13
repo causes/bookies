@@ -1,19 +1,19 @@
 = Bookies
 
-== DESCRIPTION:
+== Description
 
 Bookies is a Rails plugin for managing cookies for Facebook Connect.
 
-== USAGE:
+== Usage
 
-# Initialize Bookies
+=== Initialize Bookies
 bookies = Bookies.new(cookies, @app_id, @app_secret, @host)
 
-# Get User Data
+=== Get User Data
 bookies[:uid]
 bookies[:session_key]
 bookies[:access_token]
 bookies[:expires]
 
-# Clear Facebook cookies
+=== Clear Facebook cookies
 bookies.clear!

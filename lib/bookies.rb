@@ -1,3 +1,7 @@
+require 'rubygems'
+require 'active_support'
+require 'openssl'
+
 class Bookies
   def initialize(cookies, app_id, app_secret, domain)
     @cookies = cookies
@@ -12,12 +16,17 @@ class Bookies
     @bookies[name]
   end
 
+  def empty?
+    @bookies.empty?
+  end
+
   def inspect
     @bookies.inspect
   end
 
   def clear!
     @cookies.delete self.class.fb_cookie_key(@app_id), :domain => @domain
+    @bookies.clear
   end
 
   private
@@ -27,7 +36,7 @@ class Bookies
   end
 
   def self.parse(str)
-    return HashWithIndifferentAccess.new if str.blank?
+    return HashWithIndifferentAccess.new if str.nil? || str.empty?
     bookies = HashWithIndifferentAccess.new
     # The sub is just lchomp, if only that existed
     str.chomp('"').sub(/^"/, '').split('&').each do |kv|
@@ -39,6 +48,7 @@ class Bookies
   end
 
   def parsed_cookies
+    return {} if @cookies.nil?
     self.class.parse(@cookies[self.class.fb_cookie_key(@app_id)])
   end
 

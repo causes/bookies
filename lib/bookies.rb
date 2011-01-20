@@ -53,10 +53,13 @@ class Bookies
   end
 
   def valid?
-    generated_signature == given_signature
+    @app_secret.nil? || generated_signature == given_signature
   end
 
   def generated_signature
+    if @app_secret.nil? || @app_secret.blank?
+      raise RuntimeError.new("Can't sign anything without a secret")
+    end
     Digest::MD5.hexdigest(payload + @app_secret)
   end
 

@@ -7,14 +7,15 @@ CONFIG = {
 }
 
 BOOKIES = "\"access_token=12345|2.1reallylongnonsense__.3600.1275001200-8008|somelong_messof-garbage.&base_domain=example.com&expires=1275001200&secret=my_magic_secretthingy__&session_key=2.1reallylongnonsense__.3600.1275001200-8008&sig=7aba93541ca96c5d3cc5dec3ee305de9&uid=8008\""
-
 BAD_SIG = BOOKIES.sub(/sig=[^&]+/, 'johnhancock')
 
 COOKIES = {'sometimes_food' => true, 'fbs_12345' => BOOKIES}
+BAD_COOKIES = {'sometimes_food' => true, 'fbs_12345' => BAD_SIG}
 
 
-def build_bookies(content)
-  Bookies.new(content, CONFIG[:app_id], CONFIG[:secret], CONFIG[:domain])
+def build_bookies(content, overrides={})
+  config = CONFIG.merge(overrides)
+  Bookies.new(content, config[:app_id], config[:secret], config[:domain])
 end
 
 describe Bookies do
@@ -37,6 +38,11 @@ describe Bookies do
 
   it "rejects unsigned cookies" do
     build_bookies(BAD_SIG).should be_empty
+  end
+
+  it "doesn't verify a signature if you provide no secret" do
+    bookies = build_bookies(BAD_COOKIES, :secret => nil)
+    bookies[:uid].should == 8008
   end
 
   it "can clear Facebook-related cookies" do
